@@ -71,6 +71,20 @@ class Article < Content
     end
   end
 
+  def merge_with(article2_id)
+    if self.id != article2_id
+      article2 = Article.find(article2_id)
+      article2comments = Comment.find_all_by_article_id(article2_id)
+      self.body = self.body + article2.body
+      article2comments.each do |comment|
+        comment.article_id = self.id
+        comment.save!
+      end
+      self.save!
+      Article.destroy(article2_id)
+    end
+  end
+
   def set_permalink
     return if self.state == 'draft'
     self.permalink = self.title.to_permalink if self.permalink.nil? or self.permalink.empty?
@@ -120,6 +134,21 @@ class Article < Content
       eval(list_function.join('.'))
     end
 
+    def merge(article1_id, article2_id)
+      if article1_id != article2_id
+        article1 = Article.find(article1_id)
+        article2 = Article.find(article2_id)
+        article2comments = Comment.find_all_by_article_id(article2_id)
+        article1.body = article1.body + article2.body
+        article2comments.each do |comment|
+          comment.article_id = article1.id
+          comment.save!
+        end
+        article1.save!
+        Article.destroy(article2_id)
+      end
+    end
+    
   end
 
   def year_url
