@@ -35,6 +35,7 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def edit
+    @is_admin = Profile.find(current_user.profile_id).label == "admin"
     @article = Article.find(params[:id])
     unless @article.access_by? current_user
       redirect_to :action => 'index'
